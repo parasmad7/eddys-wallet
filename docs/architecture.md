@@ -1,25 +1,16 @@
-# Eddy's Wallet - Technical Architecture Report
+# Eddy's Wallet - Technical Architecture
 
 ## Summary
 
-Recommended stack: **React + Vite + TypeScript PWA** on the frontend, **Supabase** (PostgreSQL + Auth + real-time) on the backend, deployed to **Vercel** (free tier). This gives a solo developer the fastest path to a working cross-platform family app with minimal infrastructure to manage, strong data integrity for financial tracking, and zero app-store friction.
+**React + Vite + TypeScript PWA** on the frontend, **Supabase** (PostgreSQL + Auth + real-time) on the backend, deployed to **Vercel** (free tier). This gives a solo developer the fastest path to a working cross-platform family app with minimal infrastructure to manage, strong data integrity for financial tracking, and zero app-store friction.
 
 ---
 
 ## 1. Frontend: React PWA via Vite
 
-### Recommendation: React + Vite + TypeScript, deployed as a Progressive Web App (PWA)
+**Stack**: React + Vite + TypeScript, deployed as a Progressive Web App (PWA)
 
-### Options evaluated
-
-| Approach | Cross-platform | App store needed | Build complexity | Native feel | Solo-dev velocity |
-|----------|---------------|-----------------|-----------------|-------------|-------------------|
-| **React PWA** | All devices via browser | No | Low | Good | High |
-| React Native (Expo) | iOS + Android + Web | Yes (for mobile) | Medium | Excellent | Medium |
-| Flutter | iOS + Android + Web | Yes (for mobile) | Medium | Excellent | Medium (Dart) |
-| Native iOS + Android | iOS + Android only | Yes | High | Excellent | Low |
-
-### Why PWA wins for this app
+### Why PWA
 
 1. **Zero app-store friction.** No Apple Developer Program ($99/year), no Google Play registration ($25), no review process. The parent installs it by tapping "Add to Home Screen" on any device. The child does the same on their device. Updates deploy instantly.
 
@@ -31,7 +22,7 @@ Recommended stack: **React + Vite + TypeScript PWA** on the frontend, **Supabase
 
 5. **React + TypeScript is the largest ecosystem.** Easiest to find solutions, libraries, and (if ever needed) contributors. TypeScript catches bugs at compile time, which matters when tracking financial data.
 
-### Specific tooling
+### Tooling
 
 - **Vite** for build tooling (fast, zero-config for React + TS)
 - **vite-plugin-pwa** for service worker generation, offline support, install prompts
@@ -49,25 +40,15 @@ Recommended stack: **React + Vite + TypeScript PWA** on the frontend, **Supabase
 
 ## 2. Backend & Data: Supabase
 
-### Recommendation: Supabase (PostgreSQL + Auth + real-time subscriptions + row-level security)
+**Stack**: Supabase (managed) - PostgreSQL + Auth + real-time subscriptions + row-level security
 
-### Options evaluated
+### Why Supabase
 
-| Service | Database | Auth built-in | Real-time | Free tier | Data portability | SQL support |
-|---------|----------|--------------|-----------|-----------|-----------------|-------------|
-| **Supabase** | PostgreSQL | Yes | Yes | Generous | Excellent (Postgres dump) | Full SQL |
-| Firebase | Firestore (NoSQL) | Yes | Yes | Generous | Poor (proprietary format) | No |
-| PlanetScale | MySQL | No | No | Discontinued free | Good | Full SQL |
-| Custom (Express + Postgres on Fly.io) | PostgreSQL | DIY | DIY | Limited | Excellent | Full SQL |
-| Cloudflare D1 | SQLite | No | No | Generous | Good | SQLite subset |
-
-### Why Supabase wins for this app
-
-1. **PostgreSQL is the right database for financial data.** Transactions, balances, loans, and interest calculations are inherently relational. ACID compliance means a deposit and balance update either both succeed or both fail. Firestore's eventual consistency and denormalized document model would fight this domain at every turn.
+1. **PostgreSQL is the right database for financial data.** Transactions, balances, loans, and interest calculations are inherently relational. ACID compliance means a deposit and balance update either both succeed or both fail.
 
 2. **Auth is built in and flexible.** Supabase Auth supports email/password, magic links, and anonymous sessions out of the box. This covers the parent login (email/password) and can support the child access pattern (see Auth section below).
 
-3. **Row-level security (RLS) enforces access at the database level.** Policies like "children can only SELECT their own account data" and "only parents can INSERT transactions" are expressed as SQL policies on the tables themselves. This means even if the frontend has a bug, the database won't serve unauthorized data. This is the strongest security model of any option evaluated.
+3. **Row-level security (RLS) enforces access at the database level.** Policies like "children can only SELECT their own account data" and "only parents can INSERT transactions" are expressed as SQL policies on the tables themselves. This means even if the frontend has a bug, the database won't serve unauthorized data.
 
 4. **Real-time subscriptions for cross-device sync.** When a parent deposits allowance, the child's view updates in real time via Supabase's Postgres-backed real-time channels. No polling, no manual refresh.
 
@@ -75,7 +56,7 @@ Recommended stack: **React + Vite + TypeScript PWA** on the frontend, **Supabase
 
 6. **Data is portable.** It's just PostgreSQL. `pg_dump` exports everything. Can self-host Supabase later or migrate to any Postgres-compatible service.
 
-### Supabase project structure
+### Project structure
 
 ```
 supabase/
@@ -90,7 +71,9 @@ Use the Supabase CLI for local development (`supabase start` runs a local Postgr
 
 ## 3. Auth & Mode Switching
 
-### Recommendation: Parent authenticates with email/password; child accesses via a family-scoped PIN
+**Parent auth**: Email + password via Supabase Auth. Google sign-in planned for a future phase.
+
+**Child auth**: Family code + PIN (no email required for children).
 
 ### Design
 
@@ -291,12 +274,15 @@ CREATE INDEX idx_allowance_rules_next_run ON allowance_rules(next_run_at)
 ```
 +-------------------+         +----------------------------+
 |                   |         |         Supabase           |
-|   React PWA       | <-----> |                            |
-|   (Vite + TS)     |  HTTPS  |  Auth (JWT)                |
-|                   |         |  PostgreSQL (data)          |
-|   Hosted on       |         |  Real-time (WebSocket)     |
-|   Vercel          |         |  Edge Functions (cron jobs) |
-|                   |         |  Row-Level Security         |
+|   React PWA       | <-----> |         (managed)          |
+|   (Vite + TS)     |  HTTPS  |                            |
+|   Tailwind CSS    |         |  Auth (email/pw + JWT)     |
+|   shadcn/ui       |         |  PostgreSQL (data + RLS)   |
+|                   |         |  Real-time (WebSocket)     |
+|   Hosted on       |         |  Edge Functions            |
+|   Vercel          |         |    - child login           |
+|   (free tier)     |         |    - cron: allowance       |
+|                   |         |    - cron: interest         |
 +-------------------+         +----------------------------+
 ```
 
@@ -320,7 +306,7 @@ Supabase supports cron jobs via `pg_cron` (available on all paid plans) or via E
 - **Allowance disbursement**: Runs on schedule (e.g., every hour), queries `allowance_rules WHERE next_run_at <= now() AND is_active`, inserts transactions, updates balances, advances `next_run_at`.
 - **Interest accrual**: Runs daily/weekly/monthly per config, calculates interest on savings account balances, inserts interest transactions.
 
-For MVP, these can be simple Supabase Edge Functions triggered by a cron. No separate server needed.
+For MVP, these are simple Supabase Edge Functions triggered by a cron. No separate server needed.
 
 ---
 
@@ -351,58 +337,56 @@ A `.com` domain costs ~$10-12/year. Not required for MVP - the Vercel subdomain 
 
 ## 7. MVP Scope & Build Order
 
-### Phase 1 - Core Wallet (MVP) - ~2-3 weeks for a solo developer
+### Phase 1 - Core Wallet + Savings (MVP) - ~3-4 weeks for a solo developer
 
-1. **Project setup**: Vite + React + TypeScript + Tailwind + PWA plugin + Supabase client
-2. **Supabase setup**: Project creation, schema migration for `families`, `profiles`, `accounts`, `transactions`
+1. **Project setup**: Vite + React + TypeScript + Tailwind + shadcn/ui + PWA plugin + Supabase client
+2. **Supabase setup**: Project creation, schema migration for `families`, `profiles`, `accounts`, `transactions`, `allowance_rules`, `interest_configs`, `savings_goals`
 3. **Parent auth**: Sign up / sign in with email + password
 4. **Family creation**: Parent creates family, adds child profiles with PINs
 5. **Child login**: Family code + PIN flow via Edge Function
-6. **Account management**: Create spending account for each child
+6. **Account management**: Create spending and savings accounts for each child
 7. **Transactions**: Parent can deposit and withdraw. Both parent and child see transaction history.
-8. **Balance dashboard**: Child sees current balance, recent transactions
-9. **PWA install**: Service worker, manifest, offline shell, "Add to Home Screen" prompt
-
-**At the end of Phase 1**: A working app where a parent can give a child virtual money and the child can see their balance on any device.
-
-### Phase 2 - Allowance & Savings - ~2 weeks
-
+8. **Transfers**: Child can move money between their own accounts (spending to savings)
+9. **Balance dashboard**: Child sees current balance across accounts, recent transactions
 10. **Allowance rules**: Parent configures recurring allowance (amount, frequency)
 11. **Allowance cron**: Background job disburses allowance on schedule
-12. **Savings accounts**: Child can have a savings account alongside spending
-13. **Transfers**: Child can move money between their own accounts (spending to savings)
-14. **Interest config**: Parent sets interest rate on savings accounts
-15. **Interest cron**: Background job calculates and credits interest
-16. **Savings goals**: Child sets targets ("New bike - $50"), tracks progress
+12. **Savings interest**: Parent sets interest rate on savings accounts. Cron job calculates and credits interest periodically. Child sees their money grow over time.
+13. **Savings goals**: Child sets a target (name, amount, optional deadline) and tracks progress toward it. Teaches goal-setting and delayed gratification.
+14. **PWA install**: Service worker, manifest, offline shell, "Add to Home Screen" prompt
 
-### Phase 3 - Loans & Advanced Concepts - ~2 weeks
+**At the end of Phase 1**: A working app where a parent can give a child virtual money, the child can save toward goals and earn interest, and everything syncs across devices.
 
-17. **Loans**: Parent creates a loan for the child (principal, rate, min payment)
-18. **Loan payments**: Child makes payments from spending account; loan balance decreases
-19. **Loan dashboard**: Visual breakdown of principal, interest, remaining balance
-20. **Credit card simulation**: A special loan type with a revolving credit limit
-21. **Financial literacy badges**: Milestones ("First $100 saved!", "Loan paid off!")
+### Phase 2 - Loans & Advanced Concepts - ~2 weeks
 
-### Phase 4 - Polish - ~1 week
+15. **Loans**: Parent creates a loan for the child (principal, rate, min payment)
+16. **Loan payments**: Child makes payments from spending account; loan balance decreases
+17. **Loan dashboard**: Visual breakdown of principal, interest, remaining balance
+18. **Credit card simulation**: A special loan type with a revolving credit limit
+19. **Financial literacy badges**: Milestones ("First $100 saved!", "Loan paid off!")
 
-22. **Charts**: Balance over time, spending categories, savings progress
-23. **Notifications**: Optional push notifications for allowance received, loan payment due
-24. **Themes**: Kid-friendly UI themes (colors, avatars)
-25. **Export**: Parent can export transaction history as CSV
+### Phase 3 - Polish - ~1 week
+
+20. **Charts**: Balance over time, spending categories, savings progress
+21. **Notifications**: Optional push notifications for allowance received, loan payment due
+22. **Themes**: Kid-friendly UI themes (colors, avatars)
+23. **Export**: Parent can export transaction history as CSV
 
 ---
 
-## 8. Key Technical Decisions and Rationale
+## 8. Key Technical Decisions
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Money storage | BIGINT cents | Floats cause rounding errors with money. Cents are exact. |
-| Database | PostgreSQL (via Supabase) | ACID compliance for financial data. Relational model fits transactions/accounts naturally. |
-| Frontend | PWA over native app | Zero app-store friction. Works on all devices. Simplest deployment for a solo dev. |
+| Database | PostgreSQL (via Supabase, managed) | ACID compliance for financial data. Relational model fits transactions/accounts naturally. No self-hosted infra to manage. |
+| Frontend | React PWA (Vite + TypeScript) | Zero app-store friction. Works on all devices. Simplest deployment for a solo dev. |
+| Styling | Tailwind CSS + shadcn/ui | Utility-first CSS for fast iteration. Accessible component primitives with no runtime dependency. |
+| Frontend hosting | Vercel (free tier) | Auto-deploy from GitHub, edge caching, $0/month at family scale. |
+| Parent auth | Email + password (Supabase Auth) | Simple, standard. Google sign-in planned for a future phase. |
 | Child auth | PIN + family code (not full accounts) | Kids don't have email addresses. PIN is age-appropriate. Server-validated for cross-device support. |
 | Transaction history | Immutable append-only | Financial literacy requires seeing the full story. Corrections are explicit adjustment transactions. |
 | Real-time sync | Supabase real-time | Parent deposits show up on child's device without refresh. Built into Supabase, no extra infrastructure. |
-| Hosting | Vercel + Supabase free tiers | $0/month for family scale. Upgrade path exists if the app grows. |
+| Background jobs | Supabase Edge Functions + cron | Handles allowance disbursement and interest accrual. No separate server needed. |
 
 ---
 
@@ -415,19 +399,23 @@ A `.com` domain costs ~$10-12/year. Not required for MVP - the Vercel subdomain 
 | Child PIN security | A child could brute-force another child's PIN | Rate-limit PIN attempts in the Edge Function (max 5 attempts per 15 minutes). Log failed attempts for parent review. |
 | Offline usage | App doesn't work without internet | Service worker caches the app shell and last-known data. Show cached balance with "last updated" timestamp. Full transactions require connectivity. |
 | Supabase vendor lock-in | Migration pain if Supabase changes pricing | All data is in standard PostgreSQL. `pg_dump` exports everything. Supabase is open-source and self-hostable. |
+| Interest cron on free tier | `pg_cron` requires Supabase Pro plan | Use external cron trigger (Vercel Cron or cron-job.org free tier) to invoke Edge Functions on the free plan. Upgrade to Pro when justified. |
 
 ---
 
-## 10. Alternatives Considered But Not Recommended
+## 10. Alternatives Considered
 
 ### Firebase + React Native
-Firebase's NoSQL model (Firestore) is a poor fit for financial transaction data. Maintaining referential integrity across denormalized documents requires application-level enforcement that PostgreSQL handles natively. React Native adds build complexity (Xcode, Android Studio, app store submissions) without meaningful UX benefit for this simple app.
+Firebase's NoSQL model (Firestore) is a poor fit for financial transaction data. Maintaining referential integrity across denormalized documents requires application-level enforcement that PostgreSQL handles natively. React Native adds build complexity without meaningful UX benefit for this app.
 
 ### Next.js full-stack (API routes + Prisma + hosted Postgres)
-Viable, but reinvents what Supabase provides out of the box (auth, real-time, RLS, admin dashboard). The API route layer adds code to maintain without adding capability. Supabase's client SDK talks directly to the database with RLS enforcement, eliminating the need for a custom API layer.
+Viable, but reinvents what Supabase provides out of the box (auth, real-time, RLS, admin dashboard). The API route layer adds code to maintain without adding capability.
 
 ### Expo (React Native for Web + Mobile)
-A reasonable middle ground if native app store presence is desired later. However, Expo's web output is less optimized than a purpose-built PWA, and the added complexity of managing native builds isn't justified for the MVP. Could migrate to Expo later if app store distribution becomes a requirement.
+A reasonable middle ground if native app store presence is desired later. However, Expo's web output is less optimized than a purpose-built PWA, and the added complexity isn't justified for the MVP. Could migrate to Expo later if app store distribution becomes a requirement.
 
 ### SQLite (local-first with sync)
 Appealing for offline-first, but adds significant complexity for multi-device sync. Libraries like `cr-sqlite` and `electric-sql` are promising but immature. Supabase's real-time subscriptions solve the same problem with battle-tested infrastructure.
+
+### VPS / self-hosted backend
+Full control, but requires managing OS updates, database backups, SSL certificates, and uptime monitoring. Supabase handles all of this as a managed service at $0 for the free tier.
