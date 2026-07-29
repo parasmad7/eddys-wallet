@@ -1,0 +1,13 @@
+/* Webfonts. NOTE: no font binaries were provided by the source repo (it contains
+   docs only). These are Google Fonts substitutions chosen to match the brief
+   ("playful & colorful, rounded, kid-friendly but not childish"). Swap for real
+   licensed files if/when brand fonts exist. */
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Nunito:ital,wght@0,400..900;1,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+:root{
+  --font-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+  /* money figures: display face + tabular numerals */
+  --font-money:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+}

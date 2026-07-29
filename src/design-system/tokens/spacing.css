@@ -1,0 +1,19 @@
+:root{
+  /* 4px base grid */
+  --space-0:0px;   --space-1:4px;  --space-2:8px;  --space-3:12px;
+  --space-4:16px;  --space-5:20px; --space-6:24px; --space-7:32px;
+  --space-8:40px;  --space-9:48px; --space-10:64px; --space-11:80px;
+  --space-12:96px; --space-13:128px;
+
+  /* Layout */
+  --gutter-mobile:16px;
+  --gutter-desktop:32px;
+  --page-max:1200px;
+  --content-max:680px;
+  --app-max:430px;          /* phone-first PWA column */
+  --tabbar-height:72px;
+  --header-height:56px;
+
+  /* Minimum kid-safe hit target */
+  --hit-min:48px;
+}
