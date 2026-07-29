@@ -298,6 +298,8 @@ For the full schema, table definitions, indexes, and RLS policies, see [`docs/ar
 
 **Total hosting cost at family scale: $0/month.** Both Vercel and Supabase free tiers are more than sufficient for single-family use.
 
+**Note:** The backend (Supabase database migrations, Edge Functions, and Terraform infrastructure-as-code) lives in a separate private repository. This public repo contains the frontend application and product documentation.
+
 For full technical architecture, system diagrams, and implementation details, see [`docs/architecture.md`](docs/architecture.md).
 
 ---
