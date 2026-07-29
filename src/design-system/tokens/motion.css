@@ -1,0 +1,29 @@
+:root{
+  --dur-instant:80ms; /* @kind other */
+  --dur-fast:140ms; /* @kind other */
+  --dur-normal:220ms; /* @kind other */
+  --dur-slow:360ms; /* @kind other */
+  --dur-slower:600ms; /* @kind other */
+  --dur-celebrate:900ms; /* @kind other */
+
+  --ease-standard:cubic-bezier(.2,.8,.2,1); /* @kind other */
+  --ease-out:cubic-bezier(.16,1,.3,1); /* @kind other */
+  --ease-in:cubic-bezier(.5,0,.75,0); /* @kind other */
+  --ease-bounce:cubic-bezier(.34,1.56,.64,1); /* @kind other */
+  --ease-spring:cubic-bezier(.22,1.4,.36,1); /* @kind other */
+
+  --press-scale:.96; /* @kind other */
+  --press-translate:2px; /* @kind spacing */
+  --hover-lift:-2px; /* @kind spacing */
+}
+@keyframes eddy-pop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+@keyframes eddy-coin-drop{0%{transform:translateY(-14px) rotate(-8deg);opacity:0}70%{transform:translateY(2px) rotate(2deg);opacity:1}100%{transform:translateY(0) rotate(0);opacity:1}}
+@keyframes eddy-count-pulse{0%,100%{transform:scale(1)}40%{transform:scale(1.06)}}
+@keyframes eddy-fill{from{width:0}}
+@media (prefers-reduced-motion:reduce){
+  :root{--dur-fast:0ms; /* @kind other */
+  --dur-normal:0ms; /* @kind other */
+  --dur-slow:0ms; /* @kind other */
+  --dur-slower:0ms; /* @kind other */
+  --dur-celebrate:0ms /* @kind other */}
+}

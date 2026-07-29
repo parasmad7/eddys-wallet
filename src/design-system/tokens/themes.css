@@ -1,0 +1,46 @@
+/* Mode themes. The PRD requires unmistakable separation between parent and kid
+   modes, so each mode re-points the semantic aliases: kid mode = grape/tangerine
+   on a warm violet page; parent mode = deep indigo-grape on a cool, denser page. */
+
+[data-theme="kid"]{
+  --brand:var(--grape-500); --brand-strong:var(--grape-600);
+  --brand-soft:var(--grape-100); --brand-tint:var(--grape-50);
+  --accent:var(--tang-500); --accent-soft:var(--tang-100);
+  --surface-page:#FBF7FF;
+  --surface-card:var(--white);
+  --surface-brand:var(--grape-500);
+  --radius-card:var(--radius-xl);
+  --radius-button:var(--radius-pill);
+  --mode-label:"Kid mode"; /* @kind other */
+  --mode-header:linear-gradient(180deg,var(--grape-500),var(--grape-600));
+  --density:1.15; /* @kind other */
+}
+
+[data-theme="parent"]{
+  --brand:var(--grape-700); --brand-strong:var(--grape-800);
+  --brand-soft:var(--grape-100); --brand-tint:#F4F3FA;
+  --accent:var(--tang-500); --accent-soft:var(--tang-100);
+  --surface-page:#F6F6FA;
+  --surface-card:var(--white);
+  --surface-brand:var(--grape-700);
+  --radius-card:var(--radius-md);
+  --radius-button:var(--radius-sm);
+  --mode-label:"Parent mode"; /* @kind other */
+  --mode-header:linear-gradient(180deg,var(--grape-800),var(--grape-700));
+  --density:1; /* @kind other */
+}
+
+[data-theme="dark"]{
+  --surface-page:#151223;
+  --surface-card:#201B33;
+  --surface-sunken:#191527;
+  --surface-inverse:var(--white);
+  --brand:var(--grape-400); --brand-strong:var(--grape-300);
+  --brand-soft:#2E2450; --brand-tint:#241D3F;
+  --accent:var(--tang-400); --accent-soft:#3A2415;
+  --text-strong:#F4F1FB; --text-body:#D8D2EA; --text-muted:#A49CC0;
+  --text-faint:#7E769A; --text-link:var(--grape-300); --text-link-hover:var(--grape-200);
+  --border-subtle:#2C2543; --border-default:#382F52; --border-strong:#4A4069;
+  --money-in:var(--mint-300); --money-out:var(--berry-400); --money-interest:var(--gold-300);
+  --shadow-chunky-neutral:0 3px 0 #2C2543;
+}

@@ -1,0 +1,89 @@
+/* ---- Palette: base values ---------------------------------------------- */
+:root{
+  /* Grape — primary brand hue */
+  --grape-50:#F5F1FF;  --grape-100:#EAE2FF; --grape-200:#D5C6FF;
+  --grape-300:#B99EFF;  --grape-400:#9B76FA; --grape-500:#7C4DF4;
+  --grape-600:#6633DB;  --grape-700:#5225B0; --grape-800:#3E1B85;
+  --grape-900:#2A1259;
+
+  /* Tangerine — accent / energy hue */
+  --tang-50:#FFF4EC;  --tang-100:#FFE6D5; --tang-200:#FFCBA8;
+  --tang-300:#FFAC75; --tang-400:#FF8F47; --tang-500:#FF7A1A;
+  --tang-600:#E8620A; --tang-700:#B84B06; --tang-800:#8A3805;
+  --tang-900:#5C2503;
+
+  /* Mint — growth, savings, success */
+  --mint-50:#E8FBF3; --mint-100:#C9F5E4; --mint-200:#8FEAC8;
+  --mint-300:#4CD9A5; --mint-400:#23C68C; --mint-500:#17B978;
+  --mint-600:#0F9761; --mint-700:#0B7449; --mint-900:#053B25;
+
+  /* Berry — debt, warnings that cost money, destructive */
+  --berry-50:#FFEEF1; --berry-100:#FFD6DD; --berry-200:#FFACB9;
+  --berry-400:#F76A7C; --berry-500:#F0455B; --berry-600:#D22A41;
+  --berry-700:#A31A2E;
+
+  /* Sky — informational, parent-mode cool tone */
+  --sky-50:#EDF6FF; --sky-100:#D6EAFF; --sky-200:#A8D2FF;
+  --sky-400:#5AA9F5; --sky-500:#2E8CF0; --sky-600:#1B6FCB; --sky-700:#14528F;
+
+  /* Gold — interest earned, badges, coins */
+  --gold-100:#FFF3CE; --gold-200:#FFE49B; --gold-300:#FFD562;
+  --gold-400:#FFC53D; --gold-500:#F2AC0E; --gold-700:#A8760A;
+
+  /* Ink — warm violet-tinted neutrals */
+  --ink-900:#1E1A2E; --ink-800:#2C2642; --ink-700:#3D3654;
+  --ink-600:#544C6E; --ink-500:#6B6386; --ink-400:#8F88A8;
+  --ink-300:#B9B3C9; --ink-200:#DDD9E7; --ink-100:#EEEBF4;
+  --ink-50:#F7F5FB;  --white:#FFFFFF;
+
+  /* Fixed decorative pairs used for kid avatars / account chips */
+  --chip-grape:var(--grape-500); --chip-tang:var(--tang-500);
+  --chip-mint:var(--mint-500);  --chip-sky:var(--sky-500);
+  --chip-gold:var(--gold-400);  --chip-berry:var(--berry-500);
+}
+
+/* ---- Semantic aliases (light default) ---------------------------------- */
+:root{
+  --brand:var(--grape-500);
+  --brand-strong:var(--grape-600);
+  --brand-soft:var(--grape-100);
+  --brand-tint:var(--grape-50);
+  --brand-on:var(--white);
+
+  --accent:var(--tang-500);
+  --accent-strong:var(--tang-600);
+  --accent-soft:var(--tang-100);
+  --accent-on:var(--white);
+
+  --surface-page:#FBF9FF;
+  --surface-card:var(--white);
+  --surface-sunken:var(--ink-50);
+  --surface-inverse:var(--ink-900);
+  --surface-brand:var(--grape-500);
+
+  --text-strong:var(--ink-900);
+  --text-body:var(--ink-700);
+  --text-muted:var(--ink-500);
+  --text-faint:var(--ink-400);
+  --text-on-brand:var(--white);
+  --text-link:var(--grape-600);
+  --text-link-hover:var(--grape-700);
+
+  --border-subtle:var(--ink-100);
+  --border-default:var(--ink-200);
+  --border-strong:var(--ink-300);
+  --border-brand:var(--grape-300);
+
+  --money-in:var(--mint-600);      /* credits: deposits, allowance, interest */
+  --money-out:var(--berry-600);    /* debits: withdrawals, charges */
+  --money-interest:var(--gold-500);
+  --money-debt:var(--berry-500);
+  --money-neutral:var(--ink-700);
+
+  --success:var(--mint-500); --success-soft:var(--mint-100);
+  --warning:var(--gold-400); --warning-soft:var(--gold-100);
+  --danger:var(--berry-500); --danger-soft:var(--berry-100);
+  --info:var(--sky-500);     --info-soft:var(--sky-100);
+
+  --focus-ring:var(--grape-400);
+}
